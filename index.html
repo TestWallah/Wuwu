@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mission Rank 1 | Revision Tracker</title>
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Ultimate 22-Day Class 10 Revision Plan">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- PWA Manifest (Embedded) -->
+    <link rel="manifest" id="my-manifest">
+
+    <style>
+        /* Custom UI Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        .font-heading {
+            font-family: 'Teko', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        /* Neon Glow Effects */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+        }
+
+        .card-glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Checkbox Animation */
+        .custom-checkbox input:checked + div {
+            background-color: #22c55e;
+            border-color: #22c55e;
+        }
+        
+        .custom-checkbox input:checked + div svg {
+            display: block;
+            transform: scale(1);
+        }
+
+        .task-item {
+            transition: all 0.3s ease;
+        }
+        
+        .task-item.completed {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        /* Progress Bar Animation */
+        @keyframes fillProgress {
+            from { width: 0; }
+        }
+        
+        .progress-fill {
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Tab Animation */
+        .tab-active {
+            border-bottom: 3px solid #facc15;
+            color: #facc15;
+        }
+
+        /* Scrollbar hiding for clean UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Header Section -->
+    <header class="fixed top-0 left-0 w-full z-50 bg-[#0f172a]/90 backdrop-blur-md border-b border-slate-700 shadow-lg">
+        <div class="px-4 py-3 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-heading font-bold text-yellow-400 glow-text">MISSION RANK 1 🏆</h1>
+                <p class="text-xs text-slate-400">Class 10 | 22 Days War Mode</p>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-slate-400">Total Progress</div>
+                <div class="text-xl font-bold text-green-400" id="overall-percentage">0%</div>
+            </div>
+        </div>
+        
+        <!-- Global Progress Bar -->
+        <div class="w-full h-1.5 bg-slate-800">
+            <div id="global-progress-bar" class="h-full bg-gradient-to-r from-yellow-400 to-green-500 progress-fill" style="width: 0%"></div>
+        </div>
+
+        <!-- Phase Tabs -->
+        <div class="flex justify-around bg-slate-800/50 text-sm font-semibold">
+            <button onclick="switchTab(1)" id="tab-1" class="flex-1 py-3 text-center text-slate-400 border-b-2 border-transparent transition-colors tab-active">Phase 1<br><span class="text-[10px] font-normal">Mastery</span></button>
+            <button onclick="switchTab(2)" id="tab-2" class="flex-1 py-3 text-center text-slate-400 border-b-2 border-transparent transition-colors">Phase 2<br><span class="text-[10px] font-normal">Revise</span></button>
+            <button onclick="switchTab(3)" id="tab-3" class="flex-1 py-3 text-center text-slate-400 border-b-2 border-transparent transition-colors">Phase 3<br><span class="text-[10px] font-normal">Mock</span></button>
+        </div>
+    </header>
+
+    <!-- Main Content (Spacer for fixed header) -->
+    <div class="h-36"></div>
+
+    <!-- Motivational Quote Area -->
+    <div class="px-4 mb-4">
+        <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg p-4 border border-slate-700 shadow-md">
+            <p id="daily-quote" class="text-sm italic text-gray-300 text-center">"Loading motivation..."</p>
+        </div>
+    </div>
+
+    <!-- Days Container -->
+    <div id="days-container" class="px-4 space-y-4">
+        <!-- Javascript will inject Day Cards here -->
+    </div>
+
+    <!-- Bottom Stats / Floating Action -->
+    <div class="fixed bottom-0 left-0 w-full bg-[#0f172a] border-t border-slate-800 p-3 flex justify-between items-center z-40">
+        <div class="text-xs text-slate-500">
+            <span id="completed-count">0</span> / <span id="total-count">0</span> Tasks Done
+        </div>
+        <button onclick="resetProgress()" class="text-xs text-red-500 hover:text-red-400 underline">Reset Data</button>
+    </div>
+
+    <!-- Javascript Logic -->
+    <script>
+        // --- DATA OBJECT: The Revision Plan ---
+        const revisionPlan = [
+            // PHASE 1: Mastery Week (Days 1-7)
+            {
+                day: 1, date: "20 Jan", phase: 1, title: "Tuesday - Mastery Start",
+                tasks: [
+                    { id: "d1_m", sub: "Math", text: "Triangles: Theorems (BPT, Pythagoras) Proofs" },
+                    { id: "d1_s", sub: "Science", text: "Life Processes: Heart & Excretory Diagram" },
+                    { id: "d1_ss", sub: "SST", text: "History: Global World + Industrialization" },
+                    { id: "d1_h", sub: "Hindi", text: "Gadh: Kya Likhun?, Eershya Tu Na Gayi" },
+                    { id: "d1_e", sub: "English", text: "Prose: Two Stories about Flying, Anne Frank" },
+                    { id: "d1_x", sub: "Extra", text: "Memorize 2 Hindi Shlokas" }
+                ]
+            },
+            {
+                day: 2, date: "21 Jan", phase: 1, title: "Wednesday - Brain & Maps",
+                tasks: [
+                    { id: "d2_m", sub: "Math", text: "Coordinate Geo + Trigo Intro" },
+                    { id: "d2_s", sub: "Science", text: "Control & Coord + Human Brain Diagram" },
+                    { id: "d2_ss", sub: "SST", text: "Print Culture + Resources & Dev (Geo)" },
+                    { id: "d2_h", sub: "Hindi", text: "Gadh: Ajanta, Pani me Chanda" },
+                    { id: "d2_e", sub: "English", text: "Prose: Glimpses of India, Mijbil" },
+                    { id: "d2_x", sub: "Extra", text: "English 4-Line Translation Practice" }
+                ]
+            },
+            {
+                day: 3, date: "22 Jan", phase: 1, title: "Thursday - Heights & Flowers",
+                tasks: [
+                    { id: "d3_m", sub: "Math", text: "Trigo Applications (NCERT Examples)" },
+                    { id: "d3_s", sub: "Science", text: "Reproduction + Flower Diagram" },
+                    { id: "d3_ss", sub: "SST", text: "Geo: Water Resources + Agriculture" },
+                    { id: "d3_h", sub: "Hindi", text: "Kavya: Raskhan, Bihari (Bhakti/Niti)" },
+                    { id: "d3_e", sub: "English", text: "Prose: Madam Rides Bus, Sermon at Benares" },
+                    { id: "d3_x", sub: "Extra", text: "Carbon IUPAC Naming Practice" }
+                ]
+            },
+            {
+                day: 4, date: "23 Jan", phase: 1, title: "Friday - Circles & Light",
+                tasks: [
+                    { id: "d4_m", sub: "Math", text: "Circles: Tangent Theorems Proof" },
+                    { id: "d4_s", sub: "Science", text: "Heredity + Light (Ray Diagrams)" },
+                    { id: "d4_ss", sub: "SST", text: "Geo: Minerals/Energy + Manufacturing" },
+                    { id: "d4_h", sub: "Hindi", text: "Kavya: Cheeti, Himalaya, Swadesh Prem" },
+                    { id: "d4_e", sub: "English", text: "Prose: Proposal | Poem: Dust/Fire & Ice" },
+                    { id: "d4_x", sub: "Extra", text: "Map Work: Dams, Airports, Soil" }
+                ]
+            },
+            {
+                day: 5, date: "24 Jan", phase: 1, title: "Saturday - Areas & Eyes",
+                tasks: [
+                    { id: "d5_m", sub: "Math", text: "Areas related to Circles" },
+                    { id: "d5_s", sub: "Science", text: "Human Eye: Diagram + Defects" },
+                    { id: "d5_ss", sub: "SST", text: "Geo: Lifelines + Civics: Power Sharing" },
+                    { id: "d5_h", sub: "Hindi", text: "Kavya: Pushp ki Abhilasha, Jhansi, Bharat Mata" },
+                    { id: "d5_e", sub: "English", text: "Poem: Tiger, Wild Animals, Ball Poem" },
+                    { id: "d5_x", sub: "Extra", text: "Hindi Grammar (Ras, Chand, Alankar)" }
+                ]
+            },
+            {
+                day: 6, date: "25 Jan", phase: 1, title: "Sunday - Heavy Lifting 🔥",
+                tasks: [
+                    { id: "d6_m", sub: "Math", text: "Surface Area & Vol (Formula Sheet)" },
+                    { id: "d6_s", sub: "Science", text: "Electricity (Numericals Only)" },
+                    { id: "d6_ss", sub: "SST", text: "Civics: Federalism + Gender/Religion" },
+                    { id: "d6_h", sub: "Hindi", text: "Kavya: Nadi, Yuva Jungle | Sans: Prabuddho" },
+                    { id: "d6_e", sub: "English", text: "Poem: Amanda, Trees, Fog" },
+                    { id: "d6_x", sub: "Extra", text: "SOLVE 1 FULL MATH SAMPLE PAPER" }
+                ]
+            },
+            {
+                day: 7, date: "26 Jan", phase: 1, title: "Monday - Republic Day Special 🇮🇳",
+                tasks: [
+                    { id: "d7_m", sub: "Math", text: "Statistics (Mean, Median, Mode)" },
+                    { id: "d7_s", sub: "Science", text: "Magnetic Effects + Motor Diagram" },
+                    { id: "d7_ss", sub: "SST", text: "Civics: Pol. Parties + Outcomes of Demo." },
+                    { id: "d7_h", sub: "Hindi", text: "Sans: Chandrashekhar, Ken Kim Vardhate" },
+                    { id: "d7_e", sub: "English", text: "Poem: Custard, Anne Gregory" },
+                    { id: "d7_x", sub: "Extra", text: "History Map Work (Nationalism)" }
+                ]
+            },
+
+            // PHASE 2: Revision (Days 8-14)
+            {
+                day: 8, date: "27 Jan", phase: 2, title: "Tuesday - Speed Rev Start",
+                tasks: [
+                    { id: "d8_m", sub: "Math", text: "Real Numbers + Polynomials (Hard Qs)" },
+                    { id: "d8_s", sub: "Science", text: "Chem Ch1 + Ch2 (Balancing)" },
+                    { id: "d8_ss", sub: "SST", text: "Eco: Development + Sectors" },
+                    { id: "d8_h", sub: "Hindi", text: "Karn (Sarg 1-3) + Author Bio" },
+                    { id: "d8_e", sub: "English", text: "Sup: Triumph of Surgery, Thief Story" },
+                    { id: "d8_x", sub: "Extra", text: "Eng Grammar (Active/Passive)" }
+                ]
+            },
+            {
+                day: 9, date: "28 Jan", phase: 2, title: "Wednesday - Equations & Carbon",
+                tasks: [
+                    { id: "d9_m", sub: "Math", text: "Linear Eq + Quadratic Eq" },
+                    { id: "d9_s", sub: "Science", text: "Metals + Carbon (Reactions)" },
+                    { id: "d9_ss", sub: "SST", text: "Eco: Money + Globalization + Rights" },
+                    { id: "d9_h", sub: "Hindi", text: "Karn (Sarg 4-7) + Charitra | Sans: Aruni" },
+                    { id: "d9_e", sub: "English", text: "Sup: Midnight Visitor, Trust" },
+                    { id: "d9_x", sub: "Extra", text: "Revise Physics Formulas" }
+                ]
+            },
+            {
+                day: 10, date: "29 Jan", phase: 2, title: "Thursday - AP & Environment",
+                tasks: [
+                    { id: "d10_m", sub: "Math", text: "AP (Case Study Questions)" },
+                    { id: "d10_s", sub: "Science", text: "Environment + Biology Diagrams" },
+                    { id: "d10_ss", sub: "SST", text: "History: Nationalism Europe + India" },
+                    { id: "d10_h", sub: "Hindi", text: "Sans: Bhartiya Sanskriti, Jeevan Sutrani" },
+                    { id: "d10_e", sub: "English", text: "Sup: Footprints, Making of Scientist" },
+                    { id: "d10_x", sub: "Extra", text: "Hindi Essay Writing" }
+                ]
+            },
+            {
+                day: 11, date: "30 Jan", phase: 2, title: "Friday - Probability & Chem",
+                tasks: [
+                    { id: "d11_m", sub: "Math", text: "Probability + Mix Practice" },
+                    { id: "d11_s", sub: "Science", text: "Full Chemistry Revision" },
+                    { id: "d11_ss", sub: "SST", text: "Full Civics Revision" },
+                    { id: "d11_h", sub: "Hindi", text: "Full Grammar (Upsarg, Samas etc)" },
+                    { id: "d11_e", sub: "English", text: "Sup: Necklace, Bholi, Saved Earth" },
+                    { id: "d11_x", sub: "Extra", text: "English Unseen Passage" }
+                ]
+            },
+            {
+                day: 12, date: "31 Jan", phase: 2, title: "Saturday - Geometry & Physics",
+                tasks: [
+                    { id: "d12_m", sub: "Math", text: "Full Geometry Revision" },
+                    { id: "d12_s", sub: "Science", text: "Full Physics Revision" },
+                    { id: "d12_ss", sub: "SST", text: "Full Geography Revision" },
+                    { id: "d12_h", sub: "Hindi", text: "Full Sanskrit Revision" },
+                    { id: "d12_e", sub: "English", text: "Character Sketches (Lencho, Bholi)" },
+                    { id: "d12_x", sub: "Extra", text: "SOLVE 1 FULL SCIENCE PAPER" }
+                ]
+            },
+            {
+                day: 13, date: "01 Feb", phase: 2, title: "Sunday - Unit Revisions",
+                tasks: [
+                    { id: "d13_m", sub: "Math", text: "Full Algebra Revision" },
+                    { id: "d13_s", sub: "Science", text: "Full Biology Revision" },
+                    { id: "d13_ss", sub: "SST", text: "Full Economics Revision" },
+                    { id: "d13_l", sub: "Lang", text: "Hindi + English Model Paper" }
+                ]
+            },
+            {
+                day: 14, date: "02 Feb", phase: 2, title: "Monday - Backlog & Maps",
+                tasks: [
+                    { id: "d14_b", sub: "Backlog", text: "Finish any leftover weak topics" },
+                    { id: "d14_m", sub: "Maps", text: "India Map 10/10 Practice" },
+                    { id: "d14_r", sub: "Rest", text: "Sleep early for Phase 3" }
+                ]
+            },
+
+            // PHASE 3: Unbeatable Mode (Days 15-22)
+            {
+                day: 15, date: "03 Feb", phase: 3, title: "Tuesday - Math Mock",
+                tasks: [{ id: "d15", sub: "Test", text: "Math Full Syllabus Mock + Analysis" }]
+            },
+            {
+                day: 16, date: "04 Feb", phase: 3, title: "Wednesday - Science Mock",
+                tasks: [{ id: "d16", sub: "Test", text: "Science Full Syllabus Mock + Analysis" }]
+            },
+            {
+                day: 17, date: "05 Feb", phase: 3, title: "Thursday - SST Mock",
+                tasks: [{ id: "d17", sub: "Test", text: "SST Full Syllabus Mock + Analysis" }]
+            },
+            {
+                day: 18, date: "06 Feb", phase: 3, title: "Friday - English Mock",
+                tasks: [{ id: "d18", sub: "Test", text: "English Full Syllabus Mock (Spelling/Format)" }]
+            },
+            {
+                day: 19, date: "07 Feb", phase: 3, title: "Saturday - Hindi Mock",
+                tasks: [{ id: "d19", sub: "Test", text: "Hindi Full Syllabus Mock (Handwriting)" }]
+            },
+            {
+                day: 20, date: "08 Feb", phase: 3, title: "Sunday - Super Fast Recap",
+                tasks: [{ id: "d20", sub: "Recap", text: "Math Formulas + Sci Diagrams + Maps" }]
+            },
+            {
+                day: 21, date: "09 Feb", phase: 3, title: "Monday - Relaxed Revision",
+                tasks: [{ id: "d21", sub: "Chill", text: "Light reading. Check Dates/Poets. No stress." }]
+            },
+            {
+                day: 22, date: "10 Feb", phase: 3, title: "Tuesday - WAR READY ⚔️",
+                tasks: [{ id: "d22", sub: "Ready", text: "Pack bag. Sleep early. You are Rank 1." }]
+            }
+        ];
+
+        const quotes = [
+            "परिंदों को मंज़िल मिलेगी यक़ीनन...",
+            "12 Hours or Nothing. War Mode On.",
+            "Rank 1 is not a dream, it's a decision.",
+            "Don't stop when you are tired. Stop when you are done.",
+            "Presentation is King. Write clean!",
+            "History is written by those who study History.",
+            "Every theorem you learn is a weapon for the exam."
+        ];
+
+        // --- APP LOGIC ---
+
+        let currentPhase = 1;
+        let progressData = JSON.parse(localStorage.getItem('rank1_progress')) || {};
+
+        // 1. Initialize App
+        function init() {
+            renderDays();
+            updateUIStats();
+            setDailyQuote();
+            lucide.createIcons();
+            
+            // Generate Manifest for PWA feel
+            const manifest = {
+                name: "Mission Rank 1",
+                short_name: "Rank 1",
+                start_url: ".",
+                display: "standalone",
+                background_color: "#0f172a",
+                theme_color: "#0f172a",
+                icons: [{ src: "https://cdn-icons-png.flaticon.com/512/2997/2997232.png", sizes: "512x512", type: "image/png" }]
+            };
+            const stringManifest = JSON.stringify(manifest);
+            const blob = new Blob([stringManifest], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(blob);
+            document.querySelector('#my-manifest').setAttribute('href', manifestURL);
+        }
+
+        // 2. Render Day Cards based on Phase
+        function renderDays() {
+            const container = document.getElementById('days-container');
+            container.innerHTML = '';
+
+            const filteredPlan = revisionPlan.filter(day => day.phase === currentPhase);
+
+            filteredPlan.forEach(day => {
+                const dayCard = document.createElement('div');
+                dayCard.className = `bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-md mb-4 transition-all duration-300`;
+                
+                // Calculate day progress for the header color
+                let dayTotal = day.tasks.length;
+                let dayDone = day.tasks.filter(t => progressData[t.id]).length;
+                let dayColor = dayDone === dayTotal ? 'border-green-500/50' : 'border-slate-700';
+                if(dayDone === dayTotal) dayCard.classList.add('border-green-500');
+
+                // Card Header
+                const headerHtml = `
+                    <div class="p-4 bg-slate-900/50 flex justify-between items-center cursor-pointer" onclick="toggleDay('${day.day}')">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-slate-700 text-yellow-400 font-heading font-bold px-3 py-1 rounded text-lg">
+                                ${day.date}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-200 text-sm">${day.title}</h3>
+                                <div class="w-24 h-1 bg-slate-700 mt-1 rounded-full overflow-hidden">
+                                    <div class="h-full bg-green-500 transition-all duration-500" style="width: ${(dayDone/dayTotal)*100}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="${dayDone === dayTotal ? 'check-circle-2' : 'chevron-down'}" class="${dayDone === dayTotal ? 'text-green-500' : 'text-slate-400'} w-5 h-5"></i>
+                    </div>
+                `;
+
+                // Tasks List
+                let tasksHtml = `<div id="day-content-${day.day}" class="hidden p-4 bg-slate-800 space-y-3 border-t border-slate-700/50">`;
+                
+                day.tasks.forEach(task => {
+                    const isChecked = progressData[task.id] ? 'checked' : '';
+                    const isCompletedClass = progressData[task.id] ? 'completed' : '';
+                    
+                    tasksHtml += `
+                        <label class="task-item flex items-start gap-3 cursor-pointer ${isCompletedClass}" id="row-${task.id}">
+                            <div class="custom-checkbox relative flex-shrink-0 mt-1">
+                                <input type="checkbox" class="sr-only" onchange="toggleTask('${task.id}')" ${isChecked}>
+                                <div class="w-5 h-5 border-2 border-slate-500 rounded bg-slate-700 transition-colors flex items-center justify-center">
+                                    <svg class="w-3 h-3 text-white hidden pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-xs font-bold text-yellow-500 uppercase tracking-wide">${task.sub}</span>
+                                <p class="text-sm text-gray-300 leading-tight">${task.text}</p>
+                            </div>
+                        </label>
+                    `;
+                });
+                tasksHtml += `</div>`;
+
+                dayCard.innerHTML = headerHtml + tasksHtml;
+                container.appendChild(dayCard);
+            });
+            lucide.createIcons();
+        }
+
+        // 3. Toggle Accordion
+        function toggleDay(dayId) {
+            const content = document.getElementById(`day-content-${dayId}`);
+            content.classList.toggle('hidden');
+        }
+
+        // 4. Toggle Task Checkbox
+        function toggleTask(taskId) {
+            const row = document.getElementById(`row-${taskId}`);
+            
+            if (progressData[taskId]) {
+                delete progressData[taskId];
+                row.classList.remove('completed');
+            } else {
+                progressData[taskId] = true;
+                row.classList.add('completed');
+                // Vibration haptic feedback if supported
+                if("vibrate" in navigator) navigator.vibrate(50);
+            }
+            
+            localStorage.setItem('rank1_progress', JSON.stringify(progressData));
+            updateUIStats();
+            
+            // Re-render only headers to update mini-bars without closing accordions (Optimized: actually simpler to just update the bar logic, but for now full re-render is fast enough or we just update total stats)
+            // For smoother UX, let's just update the global stats and the specific day bar if we wanted complex logic. 
+            // Simple approach: Update global stats immediately.
+        }
+
+        // 5. Update UI Statistics
+        function updateUIStats() {
+            // Count total tasks in DB
+            let totalTasks = 0;
+            revisionPlan.forEach(d => totalTasks += d.tasks.length);
+            
+            const completedTasks = Object.keys(progressData).length;
+            const percentage = Math.round((completedTasks / totalTasks) * 100);
+
+            // Update DOM
+            document.getElementById('overall-percentage').innerText = percentage + "%";
+            document.getElementById('global-progress-bar').style.width = percentage + "%";
+            document.getElementById('completed-count').innerText = completedTasks;
+            document.getElementById('total-count').innerText = totalTasks;
+
+            // Re-render list to show green headers if day complete
+            // Note: In a larger app we would use React/Vue. Here we maintain state simply.
+            // We won't re-render entire list to avoid closing the accordion the user is looking at.
+        }
+
+        // 6. Tab Switching
+        function switchTab(phase) {
+            currentPhase = phase;
+            
+            // Update Tab Styles
+            [1, 2, 3].forEach(p => {
+                const btn = document.getElementById(`tab-${p}`);
+                if (p === phase) {
+                    btn.classList.add('tab-active');
+                    btn.classList.remove('text-slate-400');
+                    btn.classList.add('text-yellow-400');
+                } else {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('text-slate-400');
+                    btn.classList.remove('text-yellow-400');
+                }
+            });
+
+            renderDays();
+        }
+
+        // 7. Daily Quote
+        function setDailyQuote() {
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('daily-quote').innerText = `"${randomQuote}"`;
+        }
+
+        // 8. Reset Data
+        function resetProgress() {
+            if(confirm("Are you sure? All progress will be lost!")) {
+                localStorage.removeItem('rank1_progress');
+                progressData = {};
+                renderDays();
+                updateUIStats();
+            }
+        }
+
+        // Start
+        window.onload = init;
+
+    </script>
+</body>
+</html>
+
